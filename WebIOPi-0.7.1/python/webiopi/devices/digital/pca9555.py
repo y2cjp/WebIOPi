@@ -102,6 +102,15 @@ class PCA9555(GPIOPort, I2C):
         
     def __getFunction__(self, channel):
         return self.FUNCTIONS[channel]
+
+    def __getFunctionString__(self, channel):
+        func = self.__getFunction__(channel)
+        if func == self.IN:
+            return "IN"
+        elif func == self.OUT:
+            return "OUT"
+        else:
+            return "UNKNOWN"
                                        
     def __setFunction__(self, channel, value):
         if not value in [self.IN, self.OUT]:
@@ -117,6 +126,16 @@ class PCA9555(GPIOPort, I2C):
         
         self.FUNCTIONS[channel] = value
         self.__updateInputMask__()
+
+    def __setFunctionString__(self, channel, value):
+        value = value.lower()
+        if value == "in":
+            self.__setFunction__(channel, self.IN)
+        elif value == "out":
+            self.__setFunction__(channel, self.OUT)
+        else:
+            raise ValueError("Bad Function")
+        return self.getFunctionString(channel)  
 
     def __portRead__(self):
         # Read all IP_ and OP_ and mix them together according to the FUNCTIONS list
